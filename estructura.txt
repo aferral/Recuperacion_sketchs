@@ -1,0 +1,39 @@
+
+
+# Estructura proyecto
+
+# Parsear dataset
+
+consigue lista de sketchs segun gsutils
+
+Si modo 0 toma x aleatorios 
+SI modo 1 toma archivo con lista
+
+gsutil ls gs://quickdraw_dataset/full/simplified
+
+Tomar x aleatorios
+
+Escribe los obtenidos a archivo (lo hace reproducible)
+
+
+Comienza descarga en path seleccionado
+
+
+utiliza read_ndjson para pasar a imagenes
+Pasar a tf records
+
+FIN DE PREPROCESO
+
+
+
+# Entrenar clasificador
+define codigo train
+define arquitecturas planteadas
+
+
+
+# Ajustar transformacion de datos features
+
+# Evaluar en datset test
+
+# Generacion de figuras y results
