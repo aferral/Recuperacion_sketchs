@@ -39,9 +39,6 @@ def get_dataset(tf_records,epochs,batch_size,n_classes,shuffle_buffer=500):
 
   dataset = tf.data.TFRecordDataset(tf_records).map(parse_function)
   
-  def preprocess(x,y):
-      return (x,tf.one_hot(y,n_classes))
-
   # preprocesss .map(preprocess)
   dataset = dataset.shuffle(shuffle_buffer).repeat(epochs).batch(batch_size).cache()
  
@@ -58,7 +55,7 @@ def arch_skNetI(bx,by):
   dense_initializer = xavier_initializer()
   
   net = tf.reshape(bx,[-1,128,128,1],name="input")
-  bn = lambda x : batch_normalization(x,center=True,scale=True)
+  bn = lambda x : batch_normalization(x)
   
   
   #conv1_1[64]
