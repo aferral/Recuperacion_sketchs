@@ -117,7 +117,7 @@ if __name__ == "__main__":
     bs = 200
     lr=0.0001
     epochs=20
-    dataset=get_dataset(train_tf_record,epochs,bs,100,shuffle_buffer=100000)
+    dataset=get_dataset(train_tf_record,epochs,bs,100,shuffle_buffer=40000)
     architecture = arch_skNetI_residual
 
 
