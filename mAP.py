@@ -42,12 +42,12 @@ def MAP(feamat, _class):
 
 
 def Map_per_class(ap, labels):
-	
+
 	labs = np.unique(labels)
 	apl = np.zeros(len(labs))
 	for i in labs:
 		apl[i] = np.mean(ap[np.squeeze(labels==i)])
-		
+
 	return apl
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@
 import tensorflow as tf
 import numpy as np
 
+import sklearn
 from run import get_dataset
 
 
@@ -47,6 +48,7 @@ def show_graph(graph_def, max_const_size=32):
 import os
 
 test_tf_record = "/home/aferral/Escritorio/Recuperacion_sketchs/test.tfrecords"
+model_path= "/home/aferral/Escritorio/Recuperacion_sketchs/2018_07_27__11:31:41"
 model_path= "/home/inquisidor/Desktop/Recuperacion_sketchs/saved_models_residual_2/train_1/2018_07_27__17:08:51"
 ver_grafo = False
 
@@ -81,6 +83,7 @@ with tf.Session() as sess:
     predicted_test_set = []
     real_test_set = []
     features = []
+    images = []
 
     # crear dataset
 
@@ -92,12 +95,19 @@ with tf.Session() as sess:
 
 
     cant_batch = 5000 // 100 #200
+
+    img = graph.get_operation_by_name("IteratorGetNext").values()[0]
+
+    labels = graph.get_operation_by_name("IteratorGetNext").values()[1]
+
+
+    cant_batch = 5000 // 200
     for i in range(cant_batch):
         print("iteracion {0}".format(i))
 
         # calc predicted
-        pred_batch, real_l, b_vectores  = sess.run([out_name, labels, fc_name])
-        pred_batch = pred_batch.argmax(axis=1)
+        pred_batch, real_l, b_vectores, imag  = sess.run([out_name, labels, fc_name, img])
+        pred_batch = pred_batch.nonzero()[1]
 
         for elem in real_l:
             real_test_set.append(elem)
@@ -106,14 +116,17 @@ with tf.Session() as sess:
 
         for elem in b_vectores:
             features.append(elem)
+        for elem in imag:
+            images.append(elem.flatten())
 
     features = np.vstack(features)
+    images = np.vstack(images)
 
-    import sklearn
     res=sklearn.metrics.accuracy_score(real_test_set, predicted_test_set)
     print("La accuracy fue {0}".format(res))
 
-
     np.save('features.npy', features)
     np.save("labels.npy", real_test_set)
+    np.save('imagenes.npy', images)
+    # imagenes de las features []
 
