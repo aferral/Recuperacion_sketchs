@@ -101,13 +101,12 @@ with tf.Session() as sess:
     labels = graph.get_operation_by_name("IteratorGetNext").values()[1]
 
 
-    cant_batch = 5000 // 200
     for i in range(cant_batch):
         print("iteracion {0}".format(i))
 
         # calc predicted
         pred_batch, real_l, b_vectores, imag  = sess.run([out_name, labels, fc_name, img])
-        pred_batch = pred_batch.nonzero()[1]
+        pred_batch = pred_batch.argmax(axis=1)
 
         for elem in real_l:
             real_test_set.append(elem)
