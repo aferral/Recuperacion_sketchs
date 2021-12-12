@@ -25,9 +25,19 @@ def Map(n, clas, d_sorted):
 		pre = precision(funcar)
 		pm = mean(pre)
 		AP[i] = pm
-	print(Map_per_class(AP, clas))
-	plt.plot(Map_per_class(AP, clas))
-	plt.show()
+	t=Map_per_class(AP, clas)
+	print(t)
+	plt.style.use('ggplot')
+	
+	plt.title("mAP por clase")
+	plt.plot(t)
+	plt.savefig("plt.png",dpi=200)
+
+	plt.figure()
+	plt.title("Histograma mAP sobre todas las clases")
+	plt.hist(t)
+	plt.savefig("hist.png",dpi=200)
+
 	return mean(AP)
 
 def MAP(feamat, _class):
@@ -52,8 +62,13 @@ def Map_per_class(ap, labels):
 
 if __name__ == '__main__':
 	import numpy as np
-	f = np.load("features.npy")
-	labels = np.load('labels.npy')
+	import sys
+	
+	f = np.load(sys.argv[1])
+	labels = np.load(sys.argv[2])
 	labels = labels.reshape(labels.shape[0],1)
 	map1 = MAP(f,labels)
+
+
+
 	print("MAP: {0}".format(map1))

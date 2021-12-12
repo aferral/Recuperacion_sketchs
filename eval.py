@@ -1,57 +1,23 @@
-
 import tensorflow as tf
 import numpy as np
-
 import sklearn
-from run import get_dataset
-
-
-def strip_consts(graph_def, max_const_size=32):
-    """Strip large constant values from graph_def."""
-    strip_def = tf.GraphDef()
-    for n0 in graph_def.node:
-        n = strip_def.node.add()
-        n.MergeFrom(n0)
-        if n.op == 'Const':
-            tensor = n.attr['value'].tensor
-            size = len(tensor.tensor_content)
-            if size > max_const_size:
-                tensor.tensor_content = b"<stripped %d bytes>"%size
-    return strip_def
-
-def show_graph(graph_def, max_const_size=32):
-    """Visualize TensorFlow graph."""
-    if hasattr(graph_def, 'as_graph_def'):
-        graph_def = graph_def.as_graph_def()
-    strip_def = strip_consts(graph_def, max_const_size=max_const_size)
-    code = """
-        <script>
-          function load() {{
-            document.getElementById("{id}").pbtxt = {data};
-          }}
-        </script>
-        <link rel="import" href="https://tensorboard.appspot.com/tf-graph-basic.build.html" onload=load()>
-        <div style="height:600px">
-          <tf-graph-basic id="{id}"></tf-graph-basic>
-        </div>
-    """.format(data=repr(str(strip_def)), id='graph' + str(np.random.rand()))
-
-    iframe = """
-        <iframe seamless style="width:1200px;height:620px;border:0" srcdoc="{}"></iframe>
-    """.format(code.replace('"', '&quot;'))
-
-    with open("test.html",'w') as f:
-        f.write(iframe)
-    # display(HTML(iframe))
-
-
 import os
+from extras import show_graph
 
 test_tf_record = "/home/aferral/Escritorio/Recuperacion_sketchs/test.tfrecords"
-model_path= "/home/aferral/Escritorio/Recuperacion_sketchs/2018_07_27__11:31:41"
-model_path= "/home/inquisidor/Desktop/Recuperacion_sketchs/saved_models_residual_2/train_1/2018_07_27__17:08:51"
+model_path= "./models/residual"
 ver_grafo = False
 
+"""
+Como usar esto???
+
+- Para recuperar las features de un arquitectura es necesario tener el nombre del tensor. Para obtener este nombre se
+observa el grafo con la funcion en ver_grafo
+
+Se anotan los tensores en fully_conected, out_name. IMPORTANTE los tensores se indican con :0 ya que la operacion es 
+"acaNombre" y sus salidas son :x  :0 quiere decir la primera salida (usualmente tienen solo 1 salida)
+
+"""
 
 # Ver grafo
 if ver_grafo:
@@ -65,13 +31,11 @@ if ver_grafo:
 		graph = tf.get_default_graph()
 		show_graph(graph)
 
-fc_name = "fc_1/BiasAdd:0"
+
+fully_conected = "fully_connected/BiasAdd:0"
 out_name = "prediction:0"
-calc_acc = True
-tranf = True
 
 
-# todo colocar el directorio en '/home/inquisidor/Desktop/Recuperacion_sketchs/train.tfrecords'
 # calcular accuracy en test
 with tf.Session() as sess:
     archivos=os.listdir(model_path)
@@ -86,7 +50,6 @@ with tf.Session() as sess:
     images = []
 
     # crear dataset
-
     graph = sess.graph
     make_init = graph.get_operation_by_name('make_initializer')
     sess.run(make_init)
@@ -105,7 +68,7 @@ with tf.Session() as sess:
         print("iteracion {0}".format(i))
 
         # calc predicted
-        pred_batch, real_l, b_vectores, imag  = sess.run([out_name, labels, fc_name, img])
+        pred_batch, real_l, b_vectores, imag  = sess.run([out_name, labels, fully_conected, img])
         pred_batch = pred_batch.argmax(axis=1)
 
         for elem in real_l:
